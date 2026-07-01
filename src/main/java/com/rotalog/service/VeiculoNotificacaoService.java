@@ -1,10 +1,12 @@
 package com.rotalog.service;
 
 import com.rotalog.domain.TipoNotificacao;
-import com.rotalog.exception.NotificacaoFalhaException;
+import com.rotalog.dto.NotificacaoResponse;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 /**
  * Serviço especializado em envio de notificações relacionadas a veículos.
@@ -41,16 +43,25 @@ public class VeiculoNotificacaoService {
 
     /**
      * Notifica sobre alerta de manutenção preventiva.
+     *
+     * @return Optional com a resposta da api-notificacoes em caso de sucesso,
+     *         ou vazio em caso de falha (a exceção é capturada e logada).
      */
-    public void notificarManutencao(String placa, Long quilometragem) {
+    public Optional<NotificacaoResponse> notificarManutencao(String placa, Long quilometragem) {
         try {
-            notificacaoClient.enviarNotificacao(
+            NotificacaoResponse response = notificacaoClient.enviarNotificacao(
                     TipoNotificacao.ALERTA_MANUTENCAO.name(),
                     emailGestor,
                     "Veículo " + placa + " atingiu " + quilometragem + " km. Agendar manutenção preventiva."
             );
+            if (response == null) {
+                log.warn("Resposta nula da api-notificacoes ao enviar alerta de manutenção: placa={}", placa);
+                return Optional.empty();
+            }
+            return Optional.of(response);
         } catch (Exception e) {
             log.error("Falha ao enviar alerta de manutenção: {}", e.getMessage());
+            return Optional.empty();
         }
     }
 

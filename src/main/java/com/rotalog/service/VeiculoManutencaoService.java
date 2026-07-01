@@ -78,6 +78,15 @@ public class VeiculoManutencaoService {
         return veiculoProperties.getManutencao().getIntervaloMeses();
     }
 
+    /**
+     * Retorna o limite de quilometragem para manutenção preventiva.
+     * Centraliza o valor {@code veiculo.quilometragem.limiteManutencao}
+     * para o fluxo de alertas.
+     */
+    public Long getVerificarNecessidadeLimite() {
+        return veiculoProperties.getQuilometragem().getLimiteManutencao();
+    }
+
     private Veiculo buscarVeiculoOuFalhar(Long veiculoId) {
         return veiculoRepository.findById(veiculoId)
                 .orElseThrow(() -> new VeiculoNaoEncontradoException(
